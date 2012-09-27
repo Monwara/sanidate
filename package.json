@@ -1,0 +1,32 @@
+{
+  "name": "sanidate",
+  "description": "Validation-sanitizing functionality for web frameworks, browsers, and you-name-it",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Monwara/sanidate",
+  "keywords": ["sanitizing", "validation", "middleware"],
+  "author": "Monwara LLC <branko@monwara.com>",
+  "maintainers": [
+    {
+      "name": "Branko Vukelic",
+      "email": "branko@monwara.com"
+    }
+  ],
+  "main": "sanidate.js",
+  "bugs": {
+    "mail": "branko@monwara.com",
+    "url": "https://github.com/Monwara/sanidate/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Monwara/sanidate.git"
+  },
+  "engines": {
+    "node": ">= 0.4.1"
+  },
+  "licenses": [{
+    "type": "MIT",
+    "url": "https://github.com/Monwara/sanidate/raw/master/LICENSE"
+  }]
+}
+
+
