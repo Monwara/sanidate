@@ -218,7 +218,18 @@
  *
  * ## jQuery example
  *
- *     sanidate.jQuery($); // adds plugin to jQuery
+ * Although Sanidate _is_ an AMD module, it doesn't list jQuery as its
+ * dependency, since it doesn't actually _need_ it. 
+ *
+ * If you want to use Sanidate's jQuery plugin, you need to make sure Sanidate
+ * is loaded _after_ jQuery, or configure your AMD loader to load jQuery as
+ * Sanidate's dependency.
+ *
+ * Alternatively, you can run this line after jQuery has been loaded:
+ *
+ *     sanidate.jQuery($);
+ *
+ * After you've successfully activated the plugin, you can use it like this:
  *
  *     var schema = {
  *       name: 'required',
@@ -722,6 +733,11 @@
       sanidate.check(data, schema, cb);
     };
   };
+
+  // Attach the jQuery plugin automatically if jQuery seems present
+  if (jQuery && typeof jQuery === 'function' && jQuery.fn) {
+    sanidate.jQuery(jQuery);
+  }
 
   return sanidate;
 });
