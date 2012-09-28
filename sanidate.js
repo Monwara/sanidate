@@ -274,17 +274,6 @@
    */
   sanidate.funcs = {
     /**
-     * ### sanidate.funcs.none()
-     *
-     * Imposes no constraints, always succeeds.
-     */
-    'none': function() {
-      return function(v, next) {
-        next(null, v);
-      };
-    },
-
-    /**
      * ### sanidate.funcs.required()
      *
      * Makes value required, and won't pass if there is no value.
