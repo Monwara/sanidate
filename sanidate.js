@@ -600,8 +600,8 @@
 
       funcs[0](val, function(err, val, constraintName, interrupt) {
         if (err) { return final(err, null, constraintName); }
-        if (val === null) { return final(null, null, constraintName); }
         if (constraintName === null) { return final(null, val); }
+        if (val === null) { return final(null, null, constraintName); }
         runValidators(funcs.slice(1), val, final);
       });
     }
