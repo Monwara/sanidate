@@ -129,9 +129,10 @@
  * are (with arguments in square brackets):
  *
  *  + required: Simply fails if value is not supplied
+ *  + optional: [def] If no value is supplied, return the default value
+ *    (`def`), and interrupt execution of further constraints; must be the
+ *    first constraint if used with other constraints
  *  + match: [pattern] Fails if value does not match the regexp `pattern`
- *  + none: Pass-through, always succeeds, and leaves input intact, even if
- *    absent
  *  + numeric: Forces conversion to float, and fails when conversion fails
  *  + integer: Forces conversion to integer and fails when conversion fails
  *  + max: [x, integer] Forces conversion to float or integer (if `integer` 
@@ -156,9 +157,8 @@
  *  + isNotDocument: [Model, key] Same as 'isDocument', but fails if document
  *    _is_ found, and returns original value on success.
  *  + custom: [func] Uses the `func` function as constraint
- *  + optional: [def] If no value is supplied, return the default value
- *    (`def`), and interrupt execution of further constraints; must be the
- *    first constraint if used with other constraints
+ *  + derive: [paramName, func] Uses parameter `paramName` from original
+ *    user-supplied data, and applies `func` validation function to its value
  *
  * Note that you _can_ use multiple 'custom' constraints for any user-supplied
  * data.

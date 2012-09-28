@@ -123,9 +123,10 @@ Sanidate ships with a handful of (arguably) very useful constraints. These
 are (with arguments in square brackets):
 
  + required: Simply fails if value is not supplied
+ + optional: [def] If no value is supplied, return the default value
+   (`def`), and interrupt execution of further constraints; must be the
+   first constraint if used with other constraints
  + match: [pattern] Fails if value does not match the regexp `pattern`
- + none: Pass-through, always succeeds, and leaves input intact, even if
-   absent
  + numeric: Forces conversion to float, and fails when conversion fails
  + integer: Forces conversion to integer and fails when conversion fails
  + max: [x, integer] Forces conversion to float or integer (if `integer` 
@@ -150,9 +151,8 @@ are (with arguments in square brackets):
  + isNotDocument: [Model, key] Same as 'isDocument', but fails if document
    _is_ found, and returns original value on success.
  + custom: [func] Uses the `func` function as constraint
- + optional: [def] If no value is supplied, return the default value
-   (`def`), and interrupt execution of further constraints; must be the
-   first constraint if used with other constraints
+ + derive: [paramName, func] Uses parameter `paramName` from original
+   user-supplied data, and applies `func` validation function to its value
 
 Note that you _can_ use multiple 'custom' constraints for any user-supplied
 data.
@@ -235,10 +235,6 @@ takes two arguments: value of the parameter, and `next` callback.
 Note that _all_ constraint functions require the value to exist. If the
 value does not exist at all (e.g., fails required constraint), it will
 fail validation.
-
-### sanidate.funcs.none()
-
-Imposes no constraints, always succeeds.
 
 ### sanidate.funcs.required()
 
@@ -351,7 +347,19 @@ fail validation.
 
 value is found.
 
-## sanidate.checkParam(paramName, value, constraints, cb)
+### sanidate.derive(paramName, func);
+
+Uses data from another parameter to either derive its own value, or
+validate its value. This is similar to 'custom', but `func` will be
+applied to the value of the other parameter, so that it can access it as
+`this`.
+
+Note that 'derive' only operates on the _original_ value of the other
+parameter, and not the sanidated value.
+
+derivation
+
+## sanidate.checkParam(paramName, value, constraints, data, cb)
 
 Runs constraints on a parameter with `paramName` name, `value` value, and
 executes a `cb` callback when finished. The callback should expect three
