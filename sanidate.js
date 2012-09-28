@@ -558,7 +558,7 @@
     'derive': function(paramName, func) {
       var o = this.originalData[paramName];
       return function(v, next) {
-        func.call(o, v, next);
+        next(null, func(v, o), 'derive');
       };
     }
 
