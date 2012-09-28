@@ -524,7 +524,30 @@
       return function(v, next) {
         next(null, v ? v : o, v ? 'optional' : null);
       };
+    },
+
+    /**
+     * ### sanidate.derive(paramName, func);
+     *
+     * Uses data from another parameter to either derive its own value, or
+     * validate its value. This is similar to 'custom', but `func` will be
+     * applied to the value of the other parameter, so that it can access it as
+     * `this`.
+     *
+     * Note that 'derive' only operates on the _original_ value of the other
+     * parameter, and not the sanidated value.
+     *
+     * @param {String} paramName Name of the other parameter to use for
+     * derivation
+     * @param {Function} func Validation function
+     */
+    'derive': function(paramName, func) {
+      var o = this.originalData[paramName];
+      return function(v, next) {
+        func.call(o, v, next);
+      };
     }
+
   };
 
   /**
