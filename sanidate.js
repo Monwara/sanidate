@@ -544,9 +544,14 @@
      * ### sanidate.derive(paramName, func);
      *
      * Uses data from another parameter to either derive its own value, or
-     * validate its value. This is similar to 'custom', but `func` will be
-     * applied to the value of the other parameter, so that it can access it as
-     * `this`.
+     * validate its value. 
+     *
+     * The `func` function accepts two arguments. First argument is the
+     * sanidated value of the current parameter. Second paramter is the
+     * original (unsanidated) value of the other parameter. The func must
+     * return a value, which is then used for validation. To fail validation,
+     * you must return `null`. All other values (including `undefined`) will be
+     * considered valid.
      *
      * Note that 'derive' only operates on the _original_ value of the other
      * parameter, and not the sanidated value.
