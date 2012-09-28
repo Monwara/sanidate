@@ -620,16 +620,18 @@
   };
 
   /**
-   * ## sanidate.check(data, schema, cb)
+   * ## sanidate.check(data, schema, [excludeEmpty], cb)
    *
    * Sanidates the data from `data` object using `schema` validation schema,
    * and calls the `cb` callback.
    *
    * @param {Object} data Key-value pair of request parameters to validate
-   * @param {Object} schema Validation schema
+   * @param {Object} schema Sanidation schema
+   * @param {Boolean} excludeEmpty Optional flag to exclude keys for empty
+   * values
    * @param {Function} cb Callback function
    */
-  sanidate.check = function(data, schema, cb) {
+  sanidate.check = function(data, schema, excludeEmpty, cb) {
     var cleanedData = {};
     var errors = {
       count: 0,
@@ -644,7 +646,9 @@
             errors.count += 1;
             errors.errors[paramName] = constraintName;
           } else {
-            cleanedData[paramName] = val;
+            if (!excludeEmpty || (typeof val !== 'undefined' && val !== null)) {
+              cleanedData[paramName] = val;
+            }
           }
           completed--;
           if (!completed) {
@@ -654,7 +658,23 @@
     });
   };
 
-  sanidate.express = function(schema) {
+  /**
+   * ## sanidate.express(schema, excludeEmpty)
+   *
+   * Express.js middleware for automatic sanidation of data prior to request
+   * handling.
+   *
+   * The sanidated data will be stored in `req.data`, and can be accessed
+   * normally, as you would with `req.query` or `req.post`.
+   *
+   * Any validation errors that occur will cause the `dataErrors` property to
+   * appear in `req` object, so you can check for presence of this property
+   * when testing for possible errors.
+   *
+   * @param {Object} schema Sanidation schema
+   * @param {Boolean} excludeEmpty Optional flag to exclude keys for empty
+   */
+  sanidate.express = function(schema, excludeEmpty) {
     return function(req, res, next) {
       req.sanidateFuncs = sanidate.funcs;
       req.sanidate = sanidate.check;
@@ -664,7 +684,7 @@
         Object.keys(schema).forEach(function(param) {
           data[param] = req.param(param);
         });
-        sanidate.check(data, schema, function(err, data) {
+        sanidate.check(data, schema, excludeEmpty, function(err, data) {
           req.data = data;
           err.count && (req.dataErrors = err);
           next();
@@ -675,6 +695,16 @@
     };
   };
 
+  /**
+   * ## sanidate.frag(schema)
+   *
+   * FragRouter middleware. Currently, passing schema does absolutely nothing.
+   *
+   * Using this middleware, you can call `sanidate.check` as `this.sanidate()`.
+   * The method signature is the same as for `sanidate.check`.
+   *
+   * @param {Object} schema Sanidation schema (does nothing)
+   */
   sanidate.frag = function(schema) {
     return function(next) {
       this.sanidateFuncs = sanidate.funcs;
