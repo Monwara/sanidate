@@ -735,7 +735,7 @@
   };
 
   // Attach the jQuery plugin automatically if jQuery seems present
-  if (jQuery && typeof jQuery === 'function' && jQuery.fn) {
+  if (typeof jQuery === 'function' && jQuery.fn) {
     sanidate.jQuery(jQuery);
   }
 
