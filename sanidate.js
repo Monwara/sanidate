@@ -518,7 +518,10 @@
      * @param {Function} func Custom validation function
      */
     'custom': function(func) {
-      return func; 
+      var paramObject = this;
+      return function(v, next) {
+        func.call(paramObject, v, next);
+      };
     },
 
     /**
