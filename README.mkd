@@ -212,7 +212,18 @@ data.
 
 ## jQuery example
 
-    sanidate.jQuery($); // adds plugin to jQuery
+Although Sanidate _is_ an AMD module, it doesn't list jQuery as its
+dependency, since it doesn't actually _need_ it. 
+
+If you want to use Sanidate's jQuery plugin, you need to make sure Sanidate
+is loaded _after_ jQuery, or configure your AMD loader to load jQuery as
+Sanidate's dependency.
+
+Alternatively, you can run this line after jQuery has been loaded:
+
+    sanidate.jQuery($);
+
+After you've successfully activated the plugin, you can use it like this:
 
     var schema = {
       name: 'required',
@@ -376,9 +387,31 @@ This method, although exposed, is a private method, and you should not
 rely on the stability of its API.
 
 
-## sanidate.check(data, schema, cb)
+## sanidate.check(data, schema, [excludeEmpty], cb)
 
 Sanidates the data from `data` object using `schema` validation schema,
 and calls the `cb` callback.
+
+values
+
+## sanidate.express(schema, excludeEmpty)
+
+Express.js middleware for automatic sanidation of data prior to request
+handling.
+
+The sanidated data will be stored in `req.data`, and can be accessed
+normally, as you would with `req.query` or `req.post`.
+
+Any validation errors that occur will cause the `dataErrors` property to
+appear in `req` object, so you can check for presence of this property
+when testing for possible errors.
+
+
+## sanidate.frag(schema)
+
+FragRouter middleware. Currently, passing schema does absolutely nothing.
+
+Using this middleware, you can call `sanidate.check` as `this.sanidate()`.
+The method signature is the same as for `sanidate.check`.
 
 
