@@ -539,7 +539,7 @@
   };
 
   /**
-   * ## sanidate.checkParam(paramName, value, constraints, cb)
+   * ## sanidate.checkParam(paramName, value, constraints, data, cb)
    *
    * Runs constraints on a parameter with `paramName` name, `value` value, and
    * executes a `cb` callback when finished. The callback should expect three
@@ -558,13 +558,15 @@
    * @param {String} paramName Original parameter name
    * @param {String} value Value to test against constraints
    * @param {Array} constraints Array of constraints definitions
+   * @param {Object} data Original data
    * @param {Function} cb Callback function
    * @private
    */
-  sanidate.checkParam = function(paramName, value, constraints, cb) {
+  sanidate.checkParam = function(paramName, value, constraints, data, cb) {
     var paramObject = {
       name: paramName,
-      originalValue: value
+      originalValue: value,
+      originalData: data
     };
 
     function runValidators(funcs, val, final) {
@@ -624,7 +626,7 @@
     var completed = Object.keys(schema).length;
     Object.keys(schema).forEach(function(paramName) {
       sanidate.checkParam(
-        paramName, data[paramName], schema[paramName], 
+        paramName, data[paramName], schema[paramName], data,
         function(err, val, constraintName) {
           if (err || val === null) {
             errors.count += 1;
