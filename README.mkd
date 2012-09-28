@@ -157,6 +157,118 @@ are (with arguments in square brackets):
 Note that you _can_ use multiple 'custom' constraints for any user-supplied
 data.
 
+## Writing custom constraints
+
+It is possible to write custom constraint functions and use them with the 
+'custom' constraint. 
+
+Let's take a look at a simple constraint function that checks the age of a
+date field, and makes sure it is not older than 20 days:
+
+    function minAge(v, next) {
+      var now = Date.now();
+      v = new Date(v);
+      var maxDifference = 20 * 24 * 60 * 60 * 1000; // 20 days in ms
+      var difference = now - v.getTime();
+      next(null, difference < maxDifference ? v : null, 'minAge');
+    }
+
+The function takes two arguments. First argument, `v`, is the current value
+of the data, as sanidated by all previous constraints. The second argument
+is a callback function which allows Sanidate to continue applying
+other constraints.
+
+What goes on inside the function is pretty self-evident, so we won't go into
+details. The important bit is the data we pass on to the callback. Callback
+takes three arguments. 
+
+The first argument is an error object. It is currently not important, as it
+makes little difference whether you pass an error object. Presence of an
+error will be treated as failed validation. This behavior _will_ change in
+future, so it's best to always pass the error object if there has been a
+non-validation-related error (such as filesystem or database failure). In
+later versions, Sanidate will be able to somehow tell you that there has
+been an unexpected condition.
+
+The second argument is sanidated value. It's important to note that only
+`null` value is considered a failure. Falsy values like 0, empty string, and
+even undefined, are _not_ considered failure conditions. So, if you want to
+let Sanidate know that validation has failed, you _must_ pass a null value
+as sanidated value.
+
+Last argument is the constraint name. Because there can be multiple 'custom' 
+constraints, Sanidate allows constraint functions to return a different 
+constraint name in the callback. As with all other arguments, `null` is,
+again, the special value. If you pass `null` as constraint name, any further
+constraint processing will be abandoned, and the value passed to the
+callback will be used without questions. That is, for example, what 
+'optional' does. It passes on any value that user has provided, and passes
+`null` as constraint name to foce Sanidate to use any provided value
+(including `null`).
+
+Custom constraint functions have access to details about the parameter that
+is being processed (like the parameter name), the original parameter value,
+and the original values of all other parameters that are being sanidated.
+This data is stored in `this` as properties:
+
+ + `this.paramName`: parameter name
+ + `this.originalValue`: original (raw) value of the parameter
+ + `this.originalData`: all data being sanidated as name-value pairs
+
+Although the 'derive' constraint can be used effectively for the same
+purpose, we will write our own 'custom' constraint that checks email
+confirmation, just to demonstrate usage of `originalData` property.
+
+    function emailConfirmation(v, next) {
+      next(null, v === this.originalData['email'] ? v : null,
+        'emailConfirmation');
+    }
+
+We assume that the email was first entered in a field named `email`, and
+then confirmed in a field called `emailconfirm`:
+
+    var schema = {
+      email: 'email',
+      emailconfirm: [['custom', emailConfrimation]]
+    };
+
+To demonstrate the difference between 'custom' constraint and 'derive'
+constraint in this scenario, let's rewrite the above to use 'derive':
+
+   function emailConfirmation(v, o) {
+     return v === o ? v : null;
+   }
+
+   var schema = {
+     email: 'email',
+     emailconfirm: [['derive', 'email', emailConfrimation]]
+   };
+
+Note that 'emailconfirm' paramter does not have an 'email' constraint. We
+don't need to add that, since we know that if 'email' constraint on 'email'
+field failed, it must also fail for 'emailconfirm' field if it is identical
+to 'email' field.
+
+Apart from writing function for use with 'custom' constraint, you can also
+add your constraint as a named constraint to make it act as one of the
+built-in constraints. To do that, siply add your constraint to
+`sanidate.funcs` object:
+
+    sanidate.funcs.minAge = function(maxDays) {
+      return function minAge(v, next) {
+        var now = Date.now();
+        v = new Date(v);
+        var maxDifference = maxDays * 24 * 60 * 60 * 1000; // 20 days in ms
+        var difference = now - v.getTime();
+        next(null, difference < maxDifference ? v : null, 'minAge');
+      };
+    }
+
+As you can see, a built-in constraint is a function that returns functions.
+The outer function is called a setup function, which prepares the validation
+function. The outer function has access to a `paramObject` (via `this`),
+which contains more information
+
 ## Generic JavaScript example
 
     var data = {
@@ -361,9 +473,14 @@ value is found.
 ### sanidate.derive(paramName, func);
 
 Uses data from another parameter to either derive its own value, or
-validate its value. This is similar to 'custom', but `func` will be
-applied to the value of the other parameter, so that it can access it as
-`this`.
+validate its value. 
+
+The `func` function accepts two arguments. First argument is the
+sanidated value of the current parameter. Second paramter is the
+original (unsanidated) value of the other parameter. The func must
+return a value, which is then used for validation. To fail validation,
+you must return `null`. All other values (including `undefined`) will be
+considered valid.
 
 Note that 'derive' only operates on the _original_ value of the other
 parameter, and not the sanidated value.
