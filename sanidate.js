@@ -787,6 +787,7 @@
           }
           completed--;
           if (!completed) {
+            if (!errors.count) { errors = null; }
             cb(errors, cleanedData);
           }
         });
