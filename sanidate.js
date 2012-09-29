@@ -763,6 +763,10 @@
    * @param {Function} cb Callback function
    */
   sanidate.check = function(data, schema, excludeEmpty, cb) {
+    if (typeof excludeEmpty === 'function') {
+      cb = excludeEmpty;
+      excludeEmpty = false;
+    }
     var cleanedData = {};
     var errors = {
       count: 0,
