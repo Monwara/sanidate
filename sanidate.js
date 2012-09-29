@@ -810,6 +810,7 @@
    * @param {Boolean} excludeEmpty Optional flag to exclude keys for empty
    */
   sanidate.express = function(schema, excludeEmpty) {
+    excludeEmpty = typeof excludeEmpty === 'boolean' ? excludeEmpty : false;
     return function(req, res, next) {
       req.sanidateFuncs = sanidate.funcs;
       req.sanidate = sanidate.check;
