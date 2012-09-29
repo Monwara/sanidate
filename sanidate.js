@@ -8,7 +8,7 @@
  * @version 0.0.5
  * @license MIT
  */
-
+void(0); // tells uglfy to not keep docs below
 /**
  * ## Overview
  *
