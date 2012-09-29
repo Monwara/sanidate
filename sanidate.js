@@ -51,6 +51,21 @@
  * lookups in its constraint functions. In fact, it ships with two
  * Mongoose-specific constraints all good to go.
  *
+ * ## Basic usage
+ *
+ * To sanidate some data, you need two things:
+ *
+ *  + The actual data as an object (key-value parirs)
+ *  + The sanidation schema (more on that in next section)
+ *
+ * When you have both, simply call the `sanidate.check()` method:
+ *
+ *     sanidate.check(data, schema, function(err, data) {
+ *       if (err) { return console.log('Error!'); }
+ *       // Do something useful with the data, like:
+ *       console.log(data);
+ *     });
+ *
  * ## Sanidation schema
  *
  * Sanidation schema is an object that describes your desired output. Since
@@ -116,7 +131,12 @@
  * into a `Date` object before reaching the 'match' constraint.
  *
  * Think of constraint arrays as layers of filters one on top of the other on
- * which you drip the data.
+ * which you drip the data. If data is prevented to pass any of the layers,
+ * subsequent layers will not even see it. Any layer always sees data as
+ * filtered by previous layers. This is also important to remember when
+ * handling validation errors, because, for a set of chained constarints, error
+ * will only be registered for the first constraint that reports validations
+ * failure.
  *
  * The built-in constraints are constructed in such a way that you usually only
  * need one of them at a time, so chaining should generally not be required.
@@ -162,6 +182,20 @@
  *
  * Note that you _can_ use multiple 'custom' constraints for any user-supplied
  * data.
+ *
+ * ## Sanidation errors
+ *
+ * Sanidation errors are returned as first argument to the callback you pass to
+ * `sanidate.check()`. If there are no errors, you will receive `null` instead.
+ *
+ * If there are any errors, the error object will have two keys. 
+ *
+ * The `count` represents an integer count of errors. This number can never be
+ * higher than the number of parameters that were sanidated. 
+ *
+ * The `errors` key will contain a object mapping between parameter names and
+ * constraint names. Constraint names in the mapping represent the names of
+ * constraints for which the parameter values failed validation.
  *
  * ## Writing custom constraints
  *
@@ -289,8 +323,9 @@
  *     };
  *
  *     sanidate.check(data, schema, function(err, data) {
- *       console.log(err.count); // logs 1
- *       console.log(err.errors.name); logs 'required'
+ *       if (err) {
+ *         console.log('There were ' + err.count + ' errors:', err.errors);
+ *       }
  *       // data is:
  *       //   {email: 'test@example.com', number: 11}
  *     });
