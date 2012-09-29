@@ -384,15 +384,20 @@ After you've successfully activated the plugin, you can use it like this:
 
 
 ## sanidate.funcs
-*Collection of constraints functions*
 
-Each constraint function may take one argument, which controls the
-constraint parameters, or may take none. They return a function which
-takes two arguments: value of the parameter, and `next` callback.
+This object contains all of the built-in constraints that can be used by
+name in the sanidation schema. Each property is a function which may take
+one or more arguments, and which returns a sanidation function.
 
-Note that _all_ constraint functions require the value to exist. If the
-value does not exist at all (e.g., fails required constraint), it will
-fail validation.
+Sanidation functions take two arguments, of which first is the value as
+sanidized by any previous constraints, and second is a callback which
+chains to next sanidizer or finishes the chain. The sanidation function
+works more or less the same way as custom functions (see 'Writing custom 
+constraints' section for more details).
+
+You can customize any of the built-in constraints by overloading the
+function assigned to its key in this object. You can also add new built-in
+constraints by adding new keys.
 
 ### sanidate.funcs.required()
 
