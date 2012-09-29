@@ -5,7 +5,7 @@
  * you-name-it.
  *
  * @author Monwara LLC / Branko Vukelic <branko@brankovukeluc.com>
- * @version 0.0.4
+ * @version 0.0.5
  * @license MIT
  */
 
