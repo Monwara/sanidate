@@ -508,6 +508,10 @@ callback.
 Interrupts sanidation immediately if no value is found, but does not
 fail validation.
 
+If `def` is a function, it will be executed with no arguments, and its
+return value will be used as the default value. Function is always 
+executed after it is determined that default value is needed.
+
 value is found.
 
 ### sanidate.derive(paramName, func);
