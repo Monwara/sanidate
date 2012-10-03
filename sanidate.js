@@ -682,13 +682,17 @@ void(0); // tells uglfy to not keep docs below
      * Interrupts sanidation immediately if no value is found, but does not
      * fail validation.
      *
+     * If `def` is a function, it will be executed with no arguments, and its
+     * return value will be used as the default value. Function is always 
+     * executed after it is determined that default value is needed.
+     *
      * @param {Any} def Optional default value that is returned in case no
      * value is found.
      */
     'optional': function(def) {
-      var o = this.originalValue || def;
       return function(v, next) {
-        next(null, v ? v : o, v ? 'optional' : null);
+        next(null, v ? v : (typeof def === 'function' ? def() : def), 
+             v ? 'optional' : null);
       };
     },
 
