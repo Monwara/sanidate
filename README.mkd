@@ -147,6 +147,8 @@ are (with arguments in square brackets):
    (`def`), and interrupt execution of further constraints; must be the
    first constraint if used with other constraints
  + match: [pattern] Fails if value does not match the regexp `pattern`
+ + enum: [allowed] Fails if value does not appear in `allowed` array of
+   strings
  + numeric: Forces conversion to float, and fails when conversion fails
  + integer: Forces conversion to integer and fails when conversion fails
  + max: [x, integer, equality] Forces conversion to float or integer (if
@@ -404,6 +406,11 @@ constraints by adding new keys.
 ### sanidate.funcs.required()
 
 Makes value required, and won't pass if there is no value.
+
+### sanidate.funcs.enum(allowed)
+
+Fails if value does not appear in `allowed` array.
+
 
 ### sanidate.funcs.match(pattern)
 

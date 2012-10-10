@@ -153,6 +153,8 @@ void(0); // tells uglfy to not keep docs below
  *    (`def`), and interrupt execution of further constraints; must be the
  *    first constraint if used with other constraints
  *  + match: [pattern] Fails if value does not match the regexp `pattern`
+ *  + enum: [allowed] Fails if value does not appear in `allowed` array of
+ *    strings
  *  + numeric: Forces conversion to float, and fails when conversion fails
  *  + integer: Forces conversion to integer and fails when conversion fails
  *  + max: [x, integer, equality] Forces conversion to float or integer (if
@@ -447,6 +449,19 @@ void(0); // tells uglfy to not keep docs below
       return function(v, next) {
         next(null, v ? v : null, 'required');
       };
+    },
+
+    /**
+     * ### sanidate.funcs.enum(allowed)
+     *
+     * Fails if value does not appear in `allowed` array.
+     *
+     * @param {Array} allowed Array of allowed strings
+     */
+    'enum': function(allowed) {
+      return function(v, next) {
+        next(null, allowed.indexOf(v) > -1 ? v : null, 'enum');
+      }
     },
 
     /**
