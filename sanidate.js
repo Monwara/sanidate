@@ -155,9 +155,11 @@ void(0); // tells uglfy to not keep docs below
  *  + match: [pattern] Fails if value does not match the regexp `pattern`
  *  + numeric: Forces conversion to float, and fails when conversion fails
  *  + integer: Forces conversion to integer and fails when conversion fails
- *  + max: [x, integer] Forces conversion to float or integer (if `integer` 
- *    flag is set to `true`), and fails if greater than `x`
- *  + min: [x, integer] Same as `max`, but fails if less than `x`
+ *  + max: [x, integer, equality] Forces conversion to float or integer (if
+ *    `integer` flag is set to `true`), and, depending on equality boolean
+ *    falg, fails if greater than or greater _and_ equal to `x`
+ *  + min: [x, integer, equality] Same as `max`, but fails if less than / less
+ *    than or equal to`x`
  *  + date: Forces conversion to Date, and fails if conversion fails (does not
  *    work with any particular date format, so if date formatting is required, 
  *    insert the `match` constraint before date constraint)
@@ -485,34 +487,38 @@ void(0); // tells uglfy to not keep docs below
     },
 
     /**
-     * ### sanidate.funcs.min(x, integer)
+     * ### sanidate.funcs.min(x, integer, equality)
      *
      * Makes value be greater than or equal to `x`. If `integer` is `true`, it 
      * will only do integer comparison.
      *
      * @param {Number} x The minimum value allowed
-     * @param {Boolean} integer Whether to do integer comparison
+     * @param {Boolean} integer Whether to do integer comparison (default: 
+     * false)
+     * @param {Boolean} equality Whether to accept equality (default: false)
      */
-    'min': function(x, integer) {
+    'min': function(x, integer, equality) {
       return function(v, next) {
         var i = integer ? parseInt(v, 10) : parseFloat(v);
-        next(null, (!isNaN(i) && i > x) ? i : null, 'min');
+        next(null, (!isNaN(i) && (equality ? i >= x : i > x)) ? i : null, 'min');
       };
     },
 
     /**
-     * ### sanidate.funcs.max(x, integer)
+     * ### sanidate.funcs.max(x, integer, equality)
      *
      * Makes value be less than or equal to `x`. If `integer` is `true`, it 
      * will only do integer comparison.
      *
      * @param {Number} x The maximum value allowed
-     * @param {Boolean} integer Whether to do integer comparison
+     * @param {Boolean} integer Whether to do integer comparison (default: 
+     * false)
+     * @param {Boolean} equality Whether to accept equality (default: false)
      */
-    'max': function(x, integer) {
+    'max': function(x, integer, equality) {
       return function(v, next) {
         var i = integer ? parseInt(v, 10) : parseFloat(v);
-        next(null, (!isNaN(i) && i <= x) ? i : null, 'min');
+        next(null, (!isNaN(i) && (equality ? i <= x : i < x)) ? i : null, 'min');
       };
     },
 
