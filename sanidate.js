@@ -888,7 +888,7 @@ void(0); // tells uglfy to not keep docs below
         });
         sanidate.check(data, schema, excludeEmpty, function(err, data) {
           req.data = data;
-          err.count && (req.dataErrors = err);
+          err && err.count && (req.dataErrors = err);
           next();
         });
       } else {
