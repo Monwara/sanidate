@@ -816,6 +816,79 @@ void(0); // tells uglfy to not keep docs below
   };
 
   /**
+   * ## sanidate.preparationRecipes
+   *
+   * Object containing recipes used in `sanidate.prepareSchema`. Exposed to
+   * allow customization. Object maps constraint names with preparation
+   * functions which take two arguments:
+   *   + constraint (array whose first member is the constraint name, followed
+   *     by parameters)
+   *   + module which is used in preparation (see `sanidate.prepareSchema`
+   *     documentation)
+   *
+   * Function simply performs replacement, and does not need to explicitly 
+   * return a value. See built-in recipes for examples.
+   */
+  sanidate.preparationRecipes = {
+    optional: function(c, mod) { 
+      c[1] = mod[c[1]] || c[1]; 
+    },
+    match: function(c, mod) { 
+      c[1] = mod[c[1]]; 
+    },
+    isDocument: function(c, mod) { 
+      c[1] = mod[c[1]]; 
+    },
+    isNotDocument: function(c, mod) { 
+      c[1] = mod[c[1]]; 
+    },
+    custom: function(c, mod) { 
+      c[1] = mod[c[1]]; 
+    },
+    derive: function(c, mod) {
+      c[2] = mod[c[2]]; 
+    }
+  };
+
+  /**
+   * ## sanidate.prepareSchema(schema, module)
+   *
+   * Takes a schema as string or object, and replaces any string function
+   * references by matching methods from `module` object.
+   *
+   * This method is meant to be used in scenarios where schema is stored as
+   * JSON (and passed either parsed or unparsed), and therefore function
+   * and object references could not be made part of the schema.
+   *
+   * In such cases, any custom functions and objects have to be made available
+   * as a separate module or object whose properties (methods) represent the
+   * missing functions or model objects. Instead of using function references,
+   * we can use strings representing property names, and this method replaces
+   * them with actual function references or model objects.
+   *
+   * This prepares the schema for actual usage with `schema.check` method.
+   *
+   * @param {String/Object} schema Schema to be prepared
+   * @param {Object} module Module with actual functions or model objects
+   * @return {Object} Parsed schema
+   */
+  sanidate.prepareSchema = function(schema, module) {
+    var recipeKeys = Object.keys(sanidate.preparationRecipes);
+    if (typeof schema === 'string') { schema = JSON.parse(schema); }
+    Object.keys(schema).forEach(function(param) {
+      if (Array.isArray(schema[param])) {
+        schema[param].forEach(function(constraint) {
+          if (Array.isArray(constraint) && 
+              recipeKeys.indexOf(constraint[0]) > -1) {
+            sanidate.preparationRecipes[constraint[0]](constraint, module);
+          }
+        });
+      }
+    });
+    return schema;
+  };
+
+  /**
    * ## sanidate.check(data, schema, [excludeEmpty], cb)
    *
    * Sanidates the data from `data` object using `schema` validation schema,
