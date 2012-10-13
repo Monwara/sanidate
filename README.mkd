@@ -559,6 +559,37 @@ This method, although exposed, is a private method, and you should not
 rely on the stability of its API.
 
 
+## sanidate.preparationRecipes
+
+Object containing recipes used in `sanidate.prepareSchema`. Exposed to
+allow customization. Object maps constraint names with preparation
+functions which take two arguments:
+  + constraint (array whose first member is the constraint name, followed
+    by parameters)
+  + module which is used in preparation (see `sanidate.prepareSchema`
+    documentation)
+
+Function simply performs replacement, and does not need to explicitly 
+return a value. See built-in recipes for examples.
+
+## sanidate.prepareSchema(schema, module)
+
+Takes a schema as string or object, and replaces any string function
+references by matching methods from `module` object.
+
+This method is meant to be used in scenarios where schema is stored as
+JSON (and passed either parsed or unparsed), and therefore function
+and object references could not be made part of the schema.
+
+In such cases, any custom functions and objects have to be made available
+as a separate module or object whose properties (methods) represent the
+missing functions or model objects. Instead of using function references,
+we can use strings representing property names, and this method replaces
+them with actual function references or model objects.
+
+This prepares the schema for actual usage with `schema.check` method.
+
+
 ## sanidate.check(data, schema, [excludeEmpty], cb)
 
 Sanidates the data from `data` object using `schema` validation schema,
