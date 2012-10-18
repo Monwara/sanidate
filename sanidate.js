@@ -164,9 +164,10 @@ void(0); // tells uglfy to not keep docs below
  *    falg, fails if greater than or greater _and_ equal to `x`
  *  + min: [x, integer, equality] Same as `max`, but fails if less than / less
  *    than or equal to`x`
- *  + date: Forces conversion to Date, and fails if conversion fails (does not
- *    work with any particular date format, so if date formatting is required, 
- *    insert the `match` constraint before date constraint)
+ *  + date: [resetTime] Forces conversion to Date, and fails if conversion
+ *    fails (does not work with any particular date format, so if date
+ *    formatting is required, insert the `match` constraint before date
+ *    constraint)
  *  + email: Fails if value is not an email
  *  + zip: Fails if value is not a 5-digit number (such as US zip code)
  *  + phone: [digitsOnly] Fails if value does not _contain_ 10 digits 
@@ -542,14 +543,22 @@ void(0); // tells uglfy to not keep docs below
     },
 
     /**
-     * ### sanidate.funcs.date()
+     * ### sanidate.funcs.date(resetTime)
      *
      * Makes value a date.
+     *
+     * @param {Boolean} resetTime Reset time to 0 if specified
      */
-    'date': function() {
+    'date': function(resetTime) {
       return function(v, next) {
         var d = new Date(v);
-        next(null, (d.toString() !== 'Invalid Date') ? d : null, 'date');
+        var valid = d.toString() !== 'Invalid Date';
+
+        if (resetTime && valid) {
+          d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+
+        next(null, valid ? d : null, 'date');
       };
     },
 
