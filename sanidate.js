@@ -152,6 +152,8 @@ void(0); // tells uglfy to not keep docs below
  *  + optional: [def] If no value is supplied, return the default value
  *    (`def`), and interrupt execution of further constraints; must be the
  *    first constraint if used with other constraints
+ *  + optionalIfPresent: [params, def] Makes parameter optional if parameters
+ *    in `params` array are present, otherwise requires it
  *  + match: [pattern] Fails if value does not match the regexp `pattern`
  *  + enum: [allowed] Fails if value does not appear in `allowed` array of
  *    strings
@@ -715,6 +717,45 @@ void(0); // tells uglfy to not keep docs below
         next(null, v ? v : (typeof def === 'function' ? def() : def), 
              v ? 'optional' : null);
       };
+    },
+
+    /**
+     * ### sanidate.funcs.optionalIfPreset(params, def)
+     *
+     * Interrupts sanidation immediately if no value is found, *and* values are
+     * found for parameters specified in `params` array. *All* parameters
+     * listed in `params` array *must* be present to make this field optional.
+     *
+     * If `params` is a single string, it will be treated as an array with
+     * single member.
+     *
+     * Default value of `def` can be used.
+     *
+     * If `def` is a function, it will be executed with no arguments, and its
+     * return value will be used as the default value. Function is always 
+     * executed after it is determined that default value is needed.
+     *
+     * @param {Array} params Array of parameter names that make this parameter
+     * optional.
+     * @param {Any} def Value or function to use as default.
+     */
+    'optionalIfPresent': function(params, def) {
+      if (typeof params === 'string') { params = [params]; }
+      var originalData = this.originalData;
+      var check = params.every(function(key) {
+        return originalData[key] != null && originalData[key].length; 
+      });
+
+      return function(v, next) {
+        var newVal = v || (typeof def === 'function' ? def() : def);
+        if (check) {
+          // Behave as if value is optional
+          next(null, v ? v : newVal, v ? 'optionalIfPresent' : null);
+        } else {
+          // Value is required because (some of) other params are not present
+          next(null, v ? v : null, 'optionalIfPresent')
+        }
+      }
     },
 
     /**
