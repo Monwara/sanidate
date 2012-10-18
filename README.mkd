@@ -146,6 +146,8 @@ are (with arguments in square brackets):
  + optional: [def] If no value is supplied, return the default value
    (`def`), and interrupt execution of further constraints; must be the
    first constraint if used with other constraints
+ + optionalIfPresent: [params, def] Makes parameter optional if parameters
+   in `params` array are present, otherwise requires it
  + match: [pattern] Fails if value does not match the regexp `pattern`
  + enum: [allowed] Fails if value does not appear in `allowed` array of
    strings
@@ -156,9 +158,10 @@ are (with arguments in square brackets):
    falg, fails if greater than or greater _and_ equal to `x`
  + min: [x, integer, equality] Same as `max`, but fails if less than / less
    than or equal to`x`
- + date: Forces conversion to Date, and fails if conversion fails (does not
-   work with any particular date format, so if date formatting is required, 
-   insert the `match` constraint before date constraint)
+ + date: [resetTime] Forces conversion to Date, and fails if conversion
+   fails (does not work with any particular date format, so if date
+   formatting is required, insert the `match` constraint before date
+   constraint)
  + email: Fails if value is not an email
  + zip: Fails if value is not a 5-digit number (such as US zip code)
  + phone: [digitsOnly] Fails if value does not _contain_ 10 digits 
@@ -169,6 +172,8 @@ are (with arguments in square brackets):
    returns `false`, and never fails
  + isNotTrue: Returns `false` if value is 'false', 'no', 'off', or '0',
    otherwise returns `true`, and never fails
+ + strictBoolean: [optional, def] Requires parameter to be strictly boolean,
+   and fails if it's not, or always passes if `optional` flag is set.
  + isDocument: [Model, key] Looks up Mongoose model using either supplied
    optional `key`, or parameter name as key name, and fails if no documents
    are found; value is converted to returned document
@@ -439,9 +444,10 @@ will only do integer comparison.
 
 false)
 
-### sanidate.funcs.date()
+### sanidate.funcs.date(resetTime)
 
 Makes value a date.
+
 
 ### sanidate.funcs.email()
 
@@ -476,6 +482,18 @@ If the value matches any of the above, `false` is returned. Otherwise,
 `true` is returned.
 
 This validator never fails.
+
+### sanidate.func.strictBoolean(optional, def)
+
+Makes value match any of the strict boolean values. Fails if `optional`
+flag is not `true`, otherwise stops further sanidation and returns the
+original value or `def` is supplied, and original value is absent.
+
+If `def` is a function, it will be executed with no arguments, and its
+return value will be used as the default value. Function is always 
+executed after it is determined that default value is needed.
+
+false)
 
 ### sanidate.funcs.phone(digitsOnly)
 
@@ -524,6 +542,23 @@ return value will be used as the default value. Function is always
 executed after it is determined that default value is needed.
 
 value is found.
+
+### sanidate.funcs.optionalIfPreset(params, def)
+
+Interrupts sanidation immediately if no value is found, *and* values are
+found for parameters specified in `params` array. *All* parameters
+listed in `params` array *must* be present to make this field optional.
+
+If `params` is a single string, it will be treated as an array with
+single member.
+
+Default value of `def` can be used.
+
+If `def` is a function, it will be executed with no arguments, and its
+return value will be used as the default value. Function is always 
+executed after it is determined that default value is needed.
+
+optional.
 
 ### sanidate.derive(paramName, func);
 
