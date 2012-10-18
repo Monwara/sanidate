@@ -1,7 +1,7 @@
 {
   "name": "sanidate",
   "description": "Validation-sanitizing functionality for web frameworks, browsers, and you-name-it",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "homepage": "https://github.com/Monwara/sanidate",
   "keywords": ["sanitizing", "validation", "middleware"],
   "author": "Monwara LLC <branko@monwara.com>",
