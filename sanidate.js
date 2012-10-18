@@ -177,6 +177,8 @@ void(0); // tells uglfy to not keep docs below
  *    returns `false`, and never fails
  *  + isNotTrue: Returns `false` if value is 'false', 'no', 'off', or '0',
  *    otherwise returns `true`, and never fails
+ *  + strictBoolean: [optional, def] Requires parameter to be strictly boolean,
+ *    and fails if it's not, or always passes if `optional` flag is set.
  *  + isDocument: [Model, key] Looks up Mongoose model using either supplied
  *    optional `key`, or parameter name as key name, and fails if no documents
  *    are found; value is converted to returned document
@@ -611,6 +613,34 @@ void(0); // tells uglfy to not keep docs below
       return function(v, next) {
         next(null, 'false no 0 off'.split(' ').indexOf(v) < 0, 'isFalse');
       };
+    },
+
+    /**
+     * ### sanidate.func.strictBoolean(optional, def)
+     *
+     * Makes value match any of the strict boolean values. Fails if `optional`
+     * flag is not `true`, otherwise stops further sanidation and returns the
+     * original value or `def` is supplied, and original value is absent.
+     *
+     * If `def` is a function, it will be executed with no arguments, and its
+     * return value will be used as the default value. Function is always 
+     * executed after it is determined that default value is needed.
+     *
+     * @param {Boolean} optional Whether this parameter is optional (default:
+     * false)
+     * @param {Any} def Default value when value is missing
+     */
+    'strictBoolean': function(optional, def) {
+      return function(v, next) {
+        var isBool = 'true on yes 1 false off no 0'.split(' ').indexOf(v) > -1;
+        var isTrue = 'true on yes 1'.split(' ').indexOf(v) > -1;
+        var defVal = v || (typeof def === 'function' ? def() : def);
+        if (optional) {
+          return next(null, isBool ? isTrue : defVal, 
+                      defVal ? 'strictBoolean' : null);
+        }
+        next(null, isBool ? isTrue : null, 'strictBoolean');
+      }
     },
 
     /**
