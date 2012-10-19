@@ -714,7 +714,7 @@ void(0); // tells uglfy to not keep docs below
     'isNotDocument': function(Model, key) {
       key = key || this.name;
       return function(v, next) {
-        if (v == null) { return next(null, null 'isNotDocument'); }
+        if (v == null) { return next(null, null, 'isNotDocument'); }
         var criteria = {};
         criteria[key] = v;
         Model.findOne(criteria, function(err, doc) {
