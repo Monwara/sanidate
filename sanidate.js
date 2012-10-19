@@ -5,7 +5,7 @@
  * you-name-it.
  *
  * @author Monwara LLC / Branko Vukelic <branko@brankovukeluc.com>
- * @version 0.0.9
+ * @version 0.1.0
  * @license MIT
  */
 void(0); // tells uglfy to not keep docs below
