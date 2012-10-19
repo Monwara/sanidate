@@ -687,10 +687,11 @@ void(0); // tells uglfy to not keep docs below
     'isDocument': function(Model, key) {
       key = key || this.name;
       return function(v, next) {
+        if (v == null) { return next(null, null, 'isDocument'); }
         var criteria = {};
         criteria[key] = v;
         Model.findOne(criteria, function(err, doc) {
-          if (err) { next(err, null, 'isDocument'); }
+          if (err) { return next(err, null, 'isDocument'); }
           next(null, doc || null, 'isDocument');
         });
       };
@@ -713,10 +714,11 @@ void(0); // tells uglfy to not keep docs below
     'isNotDocument': function(Model, key) {
       key = key || this.name;
       return function(v, next) {
+        if (v == null) { return next(null, null 'isNotDocument'); }
         var criteria = {};
         criteria[key] = v;
         Model.findOne(criteria, function(err, doc) {
-          if (err) { next(err, null, 'isNotDocument'); }
+          if (err) { return next(err, null, 'isNotDocument'); }
           next(null, doc ? null : v, 'isNotDocument');
         });
       };
